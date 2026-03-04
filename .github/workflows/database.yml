@@ -1,0 +1,41 @@
+name: Update Database
+
+on:
+  schedule:
+    - cron: 5 4 * * *
+  workflow_dispatch:
+    inputs:
+      days:
+        type: number
+        default: 2
+      drop:
+        type: boolean
+        default: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - name: Set up Deno
+        uses: denoland/setup-deno@e95548e56dfa95d4e1a28d6f422fafe75c4c26fb # v2.0.3
+
+      - name: Restore database
+        run: deno run -A src/restore.ts
+        if: ${{ github.event_name == 'schedule' || !inputs.drop }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.PAT }}
+
+      - name: Update database
+        run: deno run -A src/database.ts
+        env:
+          DAYS: ${{ github.event_name == 'schedule' && '2' || inputs.days }}
+          GITHUB_TOKEN: ${{ secrets.PAT }}
+
+      - name: Save database
+        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
+        with:
+          path: tests.db

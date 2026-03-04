@@ -1,0 +1,6 @@
+{
+  "imports": {
+    "octokit": "npm:octokit",
+    "jszip": "npm:jszip"
+  }
+}
