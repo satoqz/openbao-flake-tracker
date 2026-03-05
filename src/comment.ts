@@ -3,6 +3,16 @@ import { Octokit } from "octokit";
 
 const db = new DatabaseSync("tests.db");
 
+const REPO = {
+  owner: Deno.env.get("OWNER") ?? "openbao",
+  repo: Deno.env.get("REPO") ?? "openbao",
+};
+
+const octokit = new Octokit({
+  userAgent: "openbao-flake-database/v0.1.0",
+  auth: Deno.env.get("GITHUB_TOKEN"),
+});
+
 const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000)
   .toISOString().replace("T", "").replace("Z", "");
 
@@ -79,15 +89,8 @@ if (flakes.length === 0) {
 
 db.close();
 
-const REPO = { owner: "openbao", repo: "openbao" };
-
-const octokit = new Octokit({
-  userAgent: "openbao-flake-database/v0.1.0",
-  auth: Deno.env.get("GITHUB_TOKEN"),
-});
-
 await octokit.rest.issues.update({
   ...REPO,
-  issue_number: parseInt(Deno.env.get("ISSUE_NUMBER")! || "1", 10),
+  issue_number: parseInt(Deno.env.get("ISSUE_NUMBER")!, 10),
   body,
 });

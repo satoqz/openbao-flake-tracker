@@ -27,7 +27,10 @@ const insert = db.prepare(
   `,
 );
 
-const REPO = { owner: "openbao", repo: "openbao" };
+const REPO = {
+  owner: Deno.env.get("OWNER") ?? "openbao",
+  repo: Deno.env.get("REPO") ?? "openbao",
+};
 
 const octokit = new Octokit({
   userAgent: "openbao-flake-database/v0.1.0",
