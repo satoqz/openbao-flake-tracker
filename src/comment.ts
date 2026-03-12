@@ -78,7 +78,7 @@ for (const flake of flakes) {
   body += `- **Package:** ${
     flake.package.replace("github.com/openbao/openbao/", "")
   }\n`;
-  body += `- **Last seen:** ${formatTime(flake.last_seen)}${
+  body += `  **Last seen:** ${formatTime(flake.last_seen)}${
     flake.pull_request != null
       ? ` in https://github.com/openbao/openbao/pull/${flake.pull_request}`
       : ""
