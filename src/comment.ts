@@ -86,7 +86,7 @@ for (const flake of flakes) {
 
   body += `  <details><summary>View ${failures.length} failed job${
     failures.length == 1 ? "" : "s"
-  }</summary>\n\n`;
+  }</summary>\n  &nbsp;\n\n`;
   body += "  | Date | Job | Commit | Pull Request |\n";
   body += "  |------|-----|--------|--------------|\n";
   for (const failure of failures) {
