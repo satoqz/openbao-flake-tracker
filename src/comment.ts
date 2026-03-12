@@ -22,7 +22,7 @@ const formatTime = (timestamp: string) =>
   timestamp.slice(0, 4); // YYYY
 
 const flakes = db.prepare(`
-  SELECT f.package, f.function, c.count, f.timestamp AS last_seen, f.pull_request
+  SELECT f.package, f.function, c.count, f.timestamp AS last_seen, f.commit_sha, f.pull_request
   FROM (
     SELECT package, function, COUNT(*) AS count, MAX(timestamp) AS last_seen
     FROM failures
@@ -39,6 +39,7 @@ const flakes = db.prepare(`
   function: string;
   count: number;
   last_seen: string;
+  commit_sha: number | null;
   pull_request: number | null;
 }>;
 
@@ -57,7 +58,6 @@ let body = `
 > We highly appreciate all help in fixing flaky tests! Once a fix has been
 > merged, the test should eventually fade out of the below list within 30 days
 > at most.
----
 `;
 
 for (const flake of flakes) {
@@ -74,23 +74,22 @@ for (const flake of flakes) {
     pull_request: number | null;
   }>;
 
-  body += `### ${flake.function}\n\n`;
-  body += `- **Package:** ${
+  body += "\n---\n\n";
+  body += `### ${flake.function} (${
     flake.package.replace("github.com/openbao/openbao/", "")
-  }\n`;
-  body += `  **Last seen:** ${formatTime(flake.last_seen)}${
+  })\n\n`;
+  body += `Last seen ${formatTime(flake.last_seen)}${
     flake.pull_request != null
       ? ` in https://github.com/openbao/openbao/pull/${flake.pull_request}`
+      : flake.commit_sha
+      ? ` in https://github.com/openbao/openbao/commit/${flake.commit_sha}`
       : ""
   }\n\n`;
 
-  body += `  <details><summary>View ${failures.length} failed job${
-    failures.length == 1 ? "" : "s"
-  }</summary>\n  &nbsp;\n\n`;
-  body += "  | Date | Job | Commit | Pull Request |\n";
-  body += "  |------|-----|--------|--------------|\n";
+  body += "| Date | Job | Commit | Pull Request |\n";
+  body += "|------|-----|--------|--------------|\n";
   for (const failure of failures) {
-    body += `  | ${
+    body += `| ${
       formatTime(failure.timestamp)
     } | [Logs](https://github.com/openbao/openbao/actions/runs/${failure.run_id}/job/${failure.job_id}?attempt=${failure.attempt}) | ${
       failure.commit_sha != null
@@ -102,11 +101,10 @@ for (const flake of flakes) {
         : "N/A"
     } |\n`;
   }
-  body += "\n  </details>\n\n---\n";
 }
 
 if (flakes.length === 0) {
-  body += "No flakes detected in the last 30 days. Happy coding!\n";
+  body += "No flakes detected in the last 30 days!\n";
 }
 
 db.close();
