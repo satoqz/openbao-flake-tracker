@@ -13,6 +13,8 @@ db.exec(
       package TEXT NOT NULL,
       function TEXT NOT NULL,
       timestamp TIMESTAMP NOT NULL,
+      commit_sha TEXT,
+      pull_request INTEGER,
       PRIMARY KEY (job_id, package, function)
     );
   `,
@@ -21,8 +23,8 @@ db.exec(
 const insert = db.prepare(
   `
     INSERT INTO failures (
-      run_id, job_id, attempt, package, function, timestamp 
-    ) VALUES (?, ?, ?, ?, ?, ?)
+      run_id, job_id, attempt, package, function, timestamp, commit_sha, pull_request
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
     ON CONFLICT(job_id, package, function) DO NOTHING;
   `,
 );
@@ -65,7 +67,17 @@ for (const run of runs) {
   // Skip run if the previous attempt didn't fail.
   if (prevRun.conclusion != "failure") continue;
 
-  console.log(`Flaky run: ${run.id}`);
+  // Extract the pull request ID if this job was triggered by one.
+  let pull: number | null = null;
+  if (run.event == "pull_request") {
+    const { data: pulls } = await octokit.rest.pulls.list({
+      ...REPO,
+      head: `${run.head_repository.owner.login}:${run.head_branch}`,
+      state: "all",
+      per_page: 1,
+    });
+    if (pulls.length != 0) pull = pulls[0].number;
+  }
 
   // Fetch all jobs for the failed attempts.
   const { data: { jobs } } = await octokit.rest.actions
@@ -159,6 +171,8 @@ for (const run of runs) {
           test.Package,
           test.Test,
           timestamp,
+          run.head_commit?.id || null,
+          pull,
         );
       }
     }

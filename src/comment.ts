@@ -54,7 +54,7 @@ let body = `
 
 for (const flake of flakes) {
   const failures = db.prepare(`
-      SELECT run_id, job_id, attempt, timestamp FROM failures
+      SELECT run_id, job_id, attempt, timestamp, commit_sha, pull_request FROM failures
       WHERE package = ? AND function = ? AND timestamp > ?
       ORDER BY timestamp DESC
     `).all(flake.package, flake.function, thirtyDaysAgo) as Array<{
@@ -62,6 +62,8 @@ for (const flake of flakes) {
     job_id: number;
     attempt: number;
     timestamp: string;
+    commit_sha: string | null;
+    pull_request: number | null;
   }>;
 
   body += `### ${flake.function}\n\n`;
@@ -73,12 +75,20 @@ for (const flake of flakes) {
   body += `<details><summary>View ${failures.length} failed job${
     failures.length == 1 ? "" : "s"
   }</summary>\n\n`;
-  body += "| Date | Job ID | Link |\n";
-  body += "|------|--------|------|\n";
+  body += "| Date | Job | Commit | Pull Request |\n";
+  body += "|------|-----|--------|--------------|\n";
   for (const failure of failures) {
     body += `| ${
       formatTime(failure.timestamp)
-    } | ${failure.job_id} | [Click here](https://github.com/openbao/openbao/actions/runs/${failure.run_id}/job/${failure.job_id}?attempt=${failure.attempt}) |\n`;
+    } | ${failure.job_id} | [Click here](https://github.com/openbao/openbao/actions/runs/${failure.run_id}/job/${failure.job_id}?attempt=${failure.attempt}) | ${
+      failure.commit_sha != null
+        ? `https://github.com/openbao/openbao/commit/${failure.commit_sha}`
+        : "?"
+    } | ${
+      failure.pull_request != null
+        ? `https://github.com/openbao/openbao/pull/${failure.pull_request}`
+        : "N/A"
+    } |\n`;
   }
   body += "\n</details>\n\n";
 }
