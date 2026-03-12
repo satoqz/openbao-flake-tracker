@@ -55,7 +55,7 @@ let body = `
 for (const flake of flakes) {
   const failures = db.prepare(`
       SELECT run_id, job_id, attempt, timestamp, commit_sha, pull_request FROM failures
-      WHERE package = ? AND function = ? AND timestamp > ?
+      WHERE package = ? AND function = ?
       ORDER BY timestamp DESC
     `).all(flake.package, flake.function, thirtyDaysAgo) as Array<{
     run_id: number;
