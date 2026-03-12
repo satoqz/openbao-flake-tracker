@@ -75,24 +75,24 @@ for (const flake of flakes) {
   }>;
 
   body += `### ${flake.function}\n\n`;
-  body += `**Package:** ${
+  body += `- **Package:** ${
     flake.package.replace("github.com/openbao/openbao/", "")
   }\n`;
-  body += `**Last seen:** ${formatTime(flake.last_seen)}${
+  body += `- **Last seen:** ${formatTime(flake.last_seen)}${
     flake.pull_request != null
       ? ` in https://github.com/openbao/openbao/pull/${flake.pull_request}`
       : ""
   }\n\n`;
 
-  body += `<details><summary>View ${failures.length} failed job${
+  body += `  <details><summary>View ${failures.length} failed job${
     failures.length == 1 ? "" : "s"
   }</summary>\n\n`;
-  body += "| Date | Job | Commit | Pull Request |\n";
-  body += "|------|-----|--------|--------------|\n";
+  body += "  | Date | Job | Commit | Pull Request |\n";
+  body += "  |------|-----|--------|--------------|\n";
   for (const failure of failures) {
-    body += `| ${
+    body += `  | ${
       formatTime(failure.timestamp)
-    } | [Click here](https://github.com/openbao/openbao/actions/runs/${failure.run_id}/job/${failure.job_id}?attempt=${failure.attempt}) | ${
+    } | [Logs](https://github.com/openbao/openbao/actions/runs/${failure.run_id}/job/${failure.job_id}?attempt=${failure.attempt}) | ${
       failure.commit_sha != null
         ? `https://github.com/openbao/openbao/commit/${failure.commit_sha}`
         : "?"
@@ -102,7 +102,7 @@ for (const flake of flakes) {
         : "N/A"
     } |\n`;
   }
-  body += "\n</details>\n\n";
+  body += "\n  </details>\n\n";
 }
 
 if (flakes.length === 0) {
