@@ -86,6 +86,13 @@ for (const flake of flakes) {
       : ""
   }\n\n`;
 
+  body +=
+    `${"```\n"}go test ${flake.package} -run '^${flake.function}$'${"\n```"}\n\n`;
+
+  body += `${failures.length} past failure${
+    failures.length == 1 ? "" : "s"
+  }:\n\n`;
+
   body += "| Date | Job | Commit | PR |\n";
   body += "|------|-----|--------|----|\n";
   for (const failure of failures) {
