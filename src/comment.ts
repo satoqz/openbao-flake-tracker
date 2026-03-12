@@ -86,8 +86,8 @@ for (const flake of flakes) {
       : ""
   }\n\n`;
 
-  body += "| Date | Job | Commit | Pull Request |\n";
-  body += "|------|-----|--------|--------------|\n";
+  body += "| Date | Job | Commit | PR |\n";
+  body += "|------|-----|--------|----|\n";
   for (const failure of failures) {
     body += `| ${
       formatTime(failure.timestamp)
