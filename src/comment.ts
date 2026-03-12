@@ -102,7 +102,7 @@ for (const flake of flakes) {
         : "N/A"
     } |\n`;
   }
-  body += "\n  </details>\n\n";
+  body += "\n  </details>\n\n---\n";
 }
 
 if (flakes.length === 0) {
