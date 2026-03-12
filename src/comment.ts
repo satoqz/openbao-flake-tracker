@@ -80,7 +80,7 @@ for (const flake of flakes) {
   for (const failure of failures) {
     body += `| ${
       formatTime(failure.timestamp)
-    } | ${failure.job_id} | [Click here](https://github.com/openbao/openbao/actions/runs/${failure.run_id}/job/${failure.job_id}?attempt=${failure.attempt}) | ${
+    } | [Click here](https://github.com/openbao/openbao/actions/runs/${failure.run_id}/job/${failure.job_id}?attempt=${failure.attempt}) | ${
       failure.commit_sha != null
         ? `https://github.com/openbao/openbao/commit/${failure.commit_sha}`
         : "?"
