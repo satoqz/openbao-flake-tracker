@@ -22,16 +22,24 @@ const formatTime = (timestamp: string) =>
   timestamp.slice(0, 4); // YYYY
 
 const flakes = db.prepare(`
-  SELECT package, function, COUNT(*) as count, MAX(timestamp) as last_seen
-  FROM failures
-  WHERE timestamp > ?
-  GROUP BY package, function
-  ORDER BY count DESC
+  SELECT f.package, f.function, c.count, f.timestamp AS last_seen, f.pull_request
+  FROM (
+    SELECT package, function, COUNT(*) AS count, MAX(timestamp) AS last_seen
+    FROM failures
+    WHERE timestamp > ?
+    GROUP BY package, function
+  ) c
+  JOIN failures f
+    ON f.package = c.package
+   AND f.function = c.function
+   AND f.timestamp = c.last_seen
+  ORDER BY c.count DESC
 `).all(thirtyDaysAgo) as Array<{
   package: string;
   function: string;
   count: number;
   last_seen: string;
+  pull_request: number | null;
 }>;
 
 let body = ` 
@@ -57,7 +65,7 @@ for (const flake of flakes) {
       SELECT run_id, job_id, attempt, timestamp, commit_sha, pull_request FROM failures
       WHERE package = ? AND function = ?
       ORDER BY timestamp DESC
-    `).all(flake.package, flake.function, thirtyDaysAgo) as Array<{
+    `).all(flake.package, flake.function) as Array<{
     run_id: number;
     job_id: number;
     attempt: number;
@@ -67,10 +75,14 @@ for (const flake of flakes) {
   }>;
 
   body += `### ${flake.function}\n\n`;
-  body += `**Package:** \`${
+  body += `**Package:** ${
     flake.package.replace("github.com/openbao/openbao/", "")
-  }\`\n`;
-  body += `**Last seen:** ${formatTime(flake.last_seen)}\n\n`;
+  }\n`;
+  body += `**Last seen:** ${formatTime(flake.last_seen)}${
+    flake.pull_request != null
+      ? ` in https://github.com/openbao/openbao/pull/${flake.pull_request}`
+      : ""
+  }\n\n`;
 
   body += `<details><summary>View ${failures.length} failed job${
     failures.length == 1 ? "" : "s"
