@@ -91,7 +91,7 @@ for (const flake of flakes) {
 
   body += `<details open><summary>${failures.length} past failure${
     failures.length == 1 ? "" : "s"
-  }:</summary>\n\n`;
+  }:</summary>\n&nbsp;\n\n`;
 
   body += "| Date | Job | Commit | PR |\n";
   body += "|------|-----|--------|----|\n";
