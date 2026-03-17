@@ -89,9 +89,9 @@ for (const flake of flakes) {
   body +=
     `${"```\n"}go test ${flake.package} -run '^${flake.function}$'${"\n```"}\n\n`;
 
-  body += `${failures.length} past failure${
+  body += `<details open><summary>${failures.length} past failure${
     failures.length == 1 ? "" : "s"
-  }:\n\n`;
+  }:</summary>\n\n`;
 
   body += "| Date | Job | Commit | PR |\n";
   body += "|------|-----|--------|----|\n";
@@ -108,6 +108,7 @@ for (const flake of flakes) {
         : "N/A"
     } |\n`;
   }
+  body += "\n</details>\n";
 }
 
 if (flakes.length === 0) {
