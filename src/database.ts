@@ -35,7 +35,7 @@ const REPO = {
 };
 
 const octokit = new Octokit({
-  userAgent: "openbao-flake-database/v0.1.0",
+  userAgent: "openbao-flake-tracker/v0.1.0",
   auth: Deno.env.get("GITHUB_TOKEN"),
 });
 
