@@ -33,7 +33,7 @@ const flakes = db.prepare(`
     ON f.package = c.package
    AND f.function = c.function
    AND f.timestamp = c.last_seen
-  ORDER BY c.count DESC
+  ORDER BY c.last_seen DESC, c.count DESC
 `).all(thirtyDaysAgo) as Array<{
   package: string;
   function: string;
