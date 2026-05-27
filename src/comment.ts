@@ -45,18 +45,11 @@ const flakes = db.prepare(`
 
 let body = ` 
 > [!NOTE]
-> This issue is automatically updated every day and provides an overview of
-> flaky tests that have appeared in CI over the past 7 days.
+> This issue is automatically updated every day and provides an overview of flaky tests that have appeared in CI over the past 7 days.
 >
-> Candidates are chosen by selecting CI workflow runs that failed and succeeded
-> after being re-triggered (no pushes can occur inbetween, as that would
-> create an entirely new run). While this approach minimizes false positives,
-> note that many failed runs are not manually retriggered and thus not taken
-> into consideration. As a result, the number of failed runs below is almost
-> guaranteed to be lower than the number of failures technically observable.
+> Candidates are chosen by selecting CI workflow runs that failed and succeeded after being re-triggered (no pushes can occur inbetween, as that would create an entirely new run). While this approach minimizes false positives, note that many failed runs are not manually retriggered and thus not taken into consideration. As a result, the number of failed runs below is almost guaranteed to be lower than the number of failures technically observable.
 >
-> We highly appreciate all help in fixing flaky tests! Once a fix has been
-> merged, the test should eventually fade out of the below list.
+> We highly appreciate all help in fixing flaky tests! Once a fix has been merged, the test should eventually fade out of the below list.
 `;
 
 for (const flake of flakes) {
