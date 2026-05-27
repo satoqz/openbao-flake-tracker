@@ -13,7 +13,7 @@ const octokit = new Octokit({
   auth: Deno.env.get("GITHUB_TOKEN"),
 });
 
-const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000)
+const cutoff = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)
   .toISOString().replace("T", "").replace("Z", "");
 
 const formatTime = (timestamp: string) =>
@@ -34,7 +34,7 @@ const flakes = db.prepare(`
    AND f.function = c.function
    AND f.timestamp = c.last_seen
   ORDER BY c.last_seen DESC, c.count DESC
-`).all(thirtyDaysAgo) as Array<{
+`).all(cutoff) as Array<{
   package: string;
   function: string;
   count: number;
@@ -46,7 +46,7 @@ const flakes = db.prepare(`
 let body = ` 
 > [!NOTE]
 > This issue is automatically updated every day and provides an overview of
-> flaky tests that have appeared in CI over the past 30 days.
+> flaky tests that have appeared in CI over the past 7 days.
 >
 > Candidates are chosen by selecting CI workflow runs that failed and succeeded
 > after being re-triggered (no pushes can occur inbetween, as that would
@@ -56,8 +56,7 @@ let body = `
 > guaranteed to be lower than the number of failures technically observable.
 >
 > We highly appreciate all help in fixing flaky tests! Once a fix has been
-> merged, the test should eventually fade out of the below list within 30 days
-> at most.
+> merged, the test should eventually fade out of the below list.
 `;
 
 for (const flake of flakes) {
