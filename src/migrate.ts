@@ -12,7 +12,11 @@ db.exec(
       WHEN package LIKE 'github.com/openbao/openbao/plugins/database%'
         THEN 'github.com/openbao/openbao/v2/internal/builtin/database'
             || SUBSTR(package, LENGTH('github.com/openbao/openbao/plugins/database') + 1)
+      WHEN package LIKE 'github.com/openbao/openbao/v2/internal/v2/internal/%'
+        THEN 'github.com/openbao/openbao/v2/internal/'
+            || SUBSTR(package, LENGTH('github.com/openbao/openbao/v2/internal/v2/internal/') + 1)
       WHEN package LIKE 'github.com/openbao/openbao/%'
+          AND package NOT LIKE 'github.com/openbao/openbao/v2%'
         THEN 'github.com/openbao/openbao/v2/internal/'
             || SUBSTR(package, LENGTH('github.com/openbao/openbao/') + 1)
       ELSE package
