@@ -68,7 +68,11 @@ for (const flake of flakes) {
 
   body += "\n---\n\n";
   body += `### ${flake.function} (${
-    flake.package.replace("github.com/openbao/openbao/", "")
+    flake.package
+      .replace("github.com/openbao/openbao/", "")
+      .replace("v2/internal", "internal")
+      .replace("sdk/v2", "sdk")
+      .replace("api/v2", "api")
   })\n\n`;
   body += `Last seen ${formatTime(flake.last_seen)}${
     flake.pull_request != null
