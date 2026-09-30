@@ -13,7 +13,8 @@ const octokit = new Octokit({
   auth: Deno.env.get("GITHUB_TOKEN"),
 });
 
-const cutoff = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)
+const cutoffDays = 14;
+const cutoff = new Date(Date.now() - cutoffDays * 24 * 60 * 60 * 1000)
   .toISOString().replace("T", "").replace("Z", "");
 
 const formatTime = (timestamp: string) =>
@@ -45,7 +46,7 @@ const flakes = db.prepare(`
 
 let body = ` 
 > [!NOTE]
-> This issue is automatically updated every day and provides an overview of flaky tests that have appeared in CI over the past 7 days.
+> This issue is automatically updated every day and provides an overview of flaky tests that have appeared in CI over the past ${cutoffDays} days.
 >
 > Candidates are chosen by selecting CI workflow runs that failed and succeeded after being re-triggered (no pushes can occur inbetween, as that would create an entirely new run). While this approach minimizes false positives, note that many failed runs are not manually retriggered and thus not taken into consideration. As a result, the number of failed runs below is almost guaranteed to be lower than the number of failures technically observable.
 >
