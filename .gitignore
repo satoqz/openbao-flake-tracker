@@ -1,1 +1,7 @@
+# SQLite
 *.db
+
+# Python
+.venv
+__pycache__
+.ruff_cache
