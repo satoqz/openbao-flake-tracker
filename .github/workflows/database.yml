@@ -11,6 +11,9 @@ on:
       drop:
         type: boolean
         default: false
+      restore_from:
+        type: string
+        required: false
 
 jobs:
   update:
@@ -31,6 +34,7 @@ jobs:
         if: ${{ github.event_name == 'schedule' || !inputs.drop }}
         env:
           GITHUB_TOKEN: ${{ secrets.PAT }}
+          RESTORE_FROM: ${{ inputs.restore_from }}
 
       - name: Update database
         run: uv run --no-sync src/database.py
