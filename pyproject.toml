@@ -2,4 +2,4 @@
 name = "openbao-flake-tracker"
 version = "0.0.0"
 requires-python = ">=3.13"
-dependencies = ["githubkit>=0.16.1,<0.17"]
+dependencies = ["githubkit>=0.17,<0.18"]
